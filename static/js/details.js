@@ -1,59 +1,48 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-    if (!id) return;
+document.addEventListener('DOMContentLoaded', function () {
+    const pathParts = window.location.pathname.split('/');
+    const gameId = parseInt(pathParts[pathParts.length - 1]);
 
-    fetch(`/jeu/${id}`)
-        .then(response => response.json())
-        .then(jeu => {
-            document.getElementById("product-name").textContent = jeu.nom;
-            document.getElementById("product-description").textContent = jeu.description;
-            document.getElementById("product-year").textContent = jeu.annee;
-            document.getElementById("product-image").innerHTML = `<img src="${jeu.image_url}" alt="${jeu.nom}">`;
-        })
-        .catch(error => console.error("Erreur chargement jeu :", error));
+    const gameDetailsContainer = document.getElementById('game-details');
 
-    fetch(`/avis/${id}`)
+    if (!gameDetailsContainer || isNaN(gameId)) {
+        console.error('ID de jeu non trouvé dans l’URL.');
+        return;
+    }
+
+    fetch('/static/details.json')
         .then(response => response.json())
-        .then(data => {
-            const reviewGrid = document.getElementById("review-grid");
-            reviewGrid.innerHTML = "";
-            data.forEach(avis => {
-                const div = document.createElement("div");
-                div.classList.add("review-card");
-                div.innerHTML = `
-                    <p><strong>${avis.nom}</strong> — ${avis.note}/5</p>
-                    <p>${avis.commentaire}</p>
-                `;
-                reviewGrid.appendChild(div);
-            });
+        .then(games => {
+            const game = games.find(g => g.id === gameId);
+
+            if (!game) {
+                gameDetailsContainer.innerHTML = '<p>Jeu non trouvé.</p>';
+                return;
+            }
+
+            const title = document.createElement('h2');
+            title.textContent = game.name;
+
+            const year = document.createElement('p');
+            year.textContent = `Année de sortie : ${game.yearpublished}`;
+
+            const image = document.createElement('img');
+            image.src = game.thumbnail;
+            image.alt = game.name;
+            image.width = 150;
+
+            const description = document.createElement('p');
+            description.innerHTML = (game.description || '')
+                .replace(/&#10;/g, '<br>')
+                .replace(/&quot;/g, '"')
+                .replace(/&amp;/g, '&')
+                .replace(/&mdash;/g, '—');
+
+            gameDetailsContainer.appendChild(title);
+            gameDetailsContainer.appendChild(year);
+            gameDetailsContainer.appendChild(image);
+            gameDetailsContainer.appendChild(description);
         })
-        .catch(error => console.error("Erreur chargement avis :", error));
+        .catch(error => {
+            console.error('Erreur de récupération des détails :', error.message);
+        });
 });
-
-function submitReview() {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
-    const commentaire = document.getElementById("comment-text").value;
-
-    const avis = {
-        jeu_id: parseInt(id),
-        nom: "Anonymous",  // À remplacer si authentification
-        note: 5,            // À remplacer si tu ajoutes une échelle
-        commentaire: commentaire
-    };
-
-    fetch("/avis", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(avis)
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert("Commentaire envoyé !");
-        window.location.reload();
-    })
-    .catch(err => console.error("Erreur ajout avis :", err));
-}

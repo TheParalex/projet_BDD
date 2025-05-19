@@ -26,8 +26,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     gameCard.classList.add('game-card');
 
                     const name = document.createElement('h3');
-                    name.textContent = detail.name;
+                    const link = document.createElement('a');
+                    link.href = `product.html/${detail.id}`;
+                    link.textContent = detail.name;
+                    name.appendChild(link);
                     gameCard.appendChild(name);
+
 
                     const year = document.createElement('p');
                     year.textContent = `Année de sortie : ${detail.yearpublished.toString()}`;

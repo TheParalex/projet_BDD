@@ -1,7 +1,8 @@
 import json
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import mysql.connector
+from flask import request
 
 app = Flask(__name__)
 
@@ -10,7 +11,7 @@ def get_db_connection():
     return {
         'host': 'localhost',
         'user': 'root',
-        'password': '',
+        'password': '@/Ex8593&',
         'database': 'projet_bdd'
     }
 
@@ -28,7 +29,7 @@ def generate_json():
         cursor = conn.cursor(dictionary=True)
 
         query = """
-            SELECT r.name, d.yearpublished, r.thumbnail
+            SELECT d.id, r.name, d.yearpublished, r.thumbnail, d.description
             FROM details d
             JOIN ratings r ON d.id = r.id
             WHERE r.thumbnail IS NOT NULL AND r.thumbnail != ''
@@ -57,6 +58,52 @@ def generate_json():
             cursor.close()
         if conn is not None:
             conn.close()
+            
+@app.route('/product.html/<int:id>')
+def get_jeu(id):
+    return render_template('product.html')
+    
+@app.route('/avis/<int:id>')
+def get_avis(id):
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connector.connect(**get_db_connection())
+        cursor = conn.cursor(dictionary=True)
+        query = """
+            SELECT nom, note, commentaire
+            FROM avis
+            WHERE jeu_id = %s
+        """
+        cursor.execute(query, (id,))
+        avis = cursor.fetchall()
+        return jsonify(avis)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
+@app.route('/avis', methods=['POST'])
+def ajouter_avis():
+    data = request.get_json()
+    conn = None
+    cursor = None
+    try:
+        conn = mysql.connector.connect(**get_db_connection())
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO avis (jeu_id, nom, note, commentaire)
+            VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (data['jeu_id'], data['nom'], data['note'], data['commentaire']))
+        conn.commit()
+        return jsonify({'message': 'Avis ajouté'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
 
 if __name__ == '__main__':
     app.run(debug=True)
