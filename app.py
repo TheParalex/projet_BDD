@@ -11,7 +11,7 @@ def get_db_connection():
     return {
         'host': 'localhost',
         'user': 'root',
-        'password': '@/Ex8593&',
+        'password': 'VotreMotDePasse',
         'database': 'projet_bdd'
     }
 
@@ -33,7 +33,6 @@ def generate_json():
             FROM details d
             JOIN ratings r ON d.id = r.id
             WHERE r.thumbnail IS NOT NULL AND r.thumbnail != ''
-            LIMIT 1000;
         """
         cursor.execute(query)
         data = cursor.fetchall()
