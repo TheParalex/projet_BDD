@@ -22,37 +22,28 @@
     <main>
         <aside class="sidebar">
             <div class="filters">
-                <div class="filter-group">
-                    <h3>Categories</h3>
-                    <ul>
-                        <li><label><input type="checkbox" checked> Label</label></li>
-                        <li><label><input type="checkbox" checked> Label</label></li>
-                        <li><label><input type="checkbox" checked> Label</label></li>
-                    </ul>
-                </div>
-
-                <div class="filter-group">
-                    <h3>Price Range</h3>
-                    <div class="price-range">
-                        <input type="range" min="0" max="100" value="50">
-                        <div class="price-labels">
-                            <span>$0</span>
-                            <span>$100</span>
-                        </div>
-                    </div>
-                </div>
+                <select id="filter-type">
+                    <option value="recherche">Recherche personnalisée</option>
+                    <option value="recents">Jeux récents</option>
+                    <option value="anciens">Jeux anciens</option>
+                    <option value="Solo">Solo</option>
+                    <option value="Petit groupe">Petit groupe</option>
+                    <option value="Groupe moyen">Groupe moyen</option>
+                    <option value="Grand groupe">Grand groupe</option>
+                    <option value="Court">Court</option>
+                    <option value="Moyen">Moyen</option>
+                    <option value="Long">Long</option>
+                </select>
             </div>
         </aside>
 
         <section class="products">
-            <div class="search-bar">
-                <input type="text" placeholder="Search">
-                <div class="sort-buttons">
-                    <button class="active">New</button>
-                    <button>Price ascending</button>
-                    <button>Price descending</button>
-                    <button>Rating</button>
-                </div>
+            <div id="filter-form">
+                <input type="text" id="filter-name" placeholder="Nom du jeu">
+                <input type="number" id="filter-annee" placeholder="Année min">
+                <input type="number" id="filter-joueurs-min" placeholder="Joueurs min">
+                <input type="number" id="filter-joueurs-max" placeholder="Joueurs max">
+                <button id="filter-btn">Filtrer</button>
             </div>
         
             <div id="games-container" class="product-grid">

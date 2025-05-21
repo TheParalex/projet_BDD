@@ -25,6 +25,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const year = document.createElement('p');
             year.textContent = `Année de sortie : ${game.yearpublished}`;
 
+            const minPlayers = game.minplayers || 'Non précisé';
+            const maxPlayers = game.maxplayers || 'Non précisé';
+            const players = document.createElement('p');
+            players.textContent = `Nombre de joueurs : ${maxPlayers}`;
+            gameDetailsContainer.appendChild(players);
+            const playTime = game.playingtime || 'Non précisé';
+            const playTimeElement = document.createElement('p');
+            playTimeElement.textContent = `Durée de jeu : ${playTime} minutes`;
+            gameDetailsContainer.appendChild(playTimeElement);
+
             const image = document.createElement('img');
             image.src = game.thumbnail;
             image.alt = game.name;
